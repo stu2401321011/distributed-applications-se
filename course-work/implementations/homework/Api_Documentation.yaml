@@ -1,0 +1,2036 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Computer Forum API",
+    "description": "\nREST API for a computer hardware forum.\n\nSupports browsing PC components, generating hardware configurations\nbased on budget and intended usage, user authentication, and\ncomment management.\n\n### Authentication\nAuthentication uses JWT Bearer tokens.\n\nAll CRUD operations require JWT Bearer token\n    Obtain a token via `POST /api/user/register` for new users or `POST /api/user/login` for already registered users and pass it as `Authorization: Bearer <token>`.\n\nTokens expire 7 days after issuance.\n\n### Roles\n\n#### Admin\n- Full CRUD access to hardware components\n- Can delete user comments\n- Cannot access user configurations\n- Cannot manage users\n\n#### User\n- Read-only access to hardware components\n- Create Read and Update access to their own comments\n- Create Read and Delete access to their own configurations\n\n### Error handling\nErrors are returned using standard HTTP status codes.\n",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/Comments/{baseId}": {
+      "get": {
+        "tags": [
+          "Comm"
+        ],
+        "summary": "Retrieves all Comments for component.",
+        "description": "Read endpoint for browsing available Comments components.",
+        "parameters": [
+          {
+            "name": "baseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments list returned successfully."
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "404": {
+            "description": "Not found. omponent was not found."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Comm"
+        ],
+        "summary": "Create new component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "baseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "writing",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component created sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          }
+        }
+      }
+    },
+    "/api/Comments/{id}": {
+      "put": {
+        "tags": [
+          "Comm"
+        ],
+        "summary": "Update component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "writing",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component Updated sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Comm"
+        ],
+        "summary": "Delete component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component deleted sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      }
+    },
+    "/api/Config": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "summary": "Retrieves all Configuration made by user.",
+        "description": "Read endpoint for browsing created configurations",
+        "responses": {
+          "200": {
+            "description": "Configurations returned successfully."
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          }
+        }
+      }
+    },
+    "/api/Config/{ssdSize}": {
+      "post": {
+        "tags": [
+          "Config"
+        ],
+        "summary": "Create new configuration.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "ssdSize",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostConfigDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostConfigDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "configuration created sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          }
+        }
+      }
+    },
+    "/api/Config/{configName}": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "summary": "Retrieves configuration by uniqueName.",
+        "description": "Read endpoint for showing configuration description",
+        "parameters": [
+          {
+            "name": "configName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "configuration specs returned successfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "404": {
+            "description": "Not found. configuration was not found."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Config"
+        ],
+        "summary": "Delete configuration.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "configName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Configuration deleted sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Configuration was not found."
+          }
+        }
+      }
+    },
+    "/api/CPU": {
+      "get": {
+        "tags": [
+          "CPU"
+        ],
+        "summary": "Retrieves all CPUs.",
+        "description": "Read endpoint for browsing available CPU components.",
+        "responses": {
+          "200": {
+            "description": "CPU list returned successfully.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetCPUDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetCPUDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetCPUDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CPU"
+        ],
+        "summary": "Create new component.",
+        "description": "Accessible to admin only",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCPUDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCPUDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCPUDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component created sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          }
+        }
+      }
+    },
+    "/api/CPU/{id}": {
+      "get": {
+        "tags": [
+          "CPU"
+        ],
+        "summary": "Retrieves component by id.",
+        "description": "Read endpoint for showing component description",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "component specs returned successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetCPUDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetCPUDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetCPUDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "404": {
+            "description": "Not found. omponent was not found."
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "CPU"
+        ],
+        "summary": "Update component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component Updated sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CPU"
+        ],
+        "summary": "Delete component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component deleted sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      }
+    },
+    "/api/GPU": {
+      "get": {
+        "tags": [
+          "GPU"
+        ],
+        "summary": "Retrieves all GPUs.",
+        "description": "Read endpoint for browsing available GPU components.",
+        "responses": {
+          "200": {
+            "description": "GPU list returned successfully."
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "GPU"
+        ],
+        "summary": "Create new component.",
+        "description": "Accessible to admin only",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostGPUDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostGPUDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostGPUDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component created sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          }
+        }
+      }
+    },
+    "/api/GPU/{id}": {
+      "get": {
+        "tags": [
+          "GPU"
+        ],
+        "summary": "Retrieves component by id.",
+        "description": "Read endpoint for showing component description",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "component specs returned successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetGPUDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetGPUDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetGPUDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "GPU"
+        ],
+        "summary": "Update component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component Updated sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "GPU"
+        ],
+        "summary": "Delete component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component deleted sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      }
+    },
+    "/api/Mobo": {
+      "get": {
+        "tags": [
+          "Mobo"
+        ],
+        "summary": "Retrieves all Motherboards.",
+        "description": "Read endpoint for browsing available Motherboards components.",
+        "responses": {
+          "200": {
+            "description": "Motherboards list returned successfully."
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Mobo"
+        ],
+        "summary": "Create new component.",
+        "description": "Accessible to admin only",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostMoboDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostMoboDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostMoboDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component created sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          }
+        }
+      }
+    },
+    "/api/Mobo/{id}": {
+      "get": {
+        "tags": [
+          "Mobo"
+        ],
+        "summary": "Retrieves component by id.",
+        "description": "Read endpoint for showing component description",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "component specs returned successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetMoboDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetMoboDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetMoboDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "404": {
+            "description": "Not found. omponent was not found."
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Mobo"
+        ],
+        "summary": "Update component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component Updated sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Mobo"
+        ],
+        "summary": "Delete component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component deleted sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      }
+    },
+    "/api/Pcu": {
+      "get": {
+        "tags": [
+          "Pcu"
+        ],
+        "summary": "Retrieves all Pcu.",
+        "description": "Read endpoint for browsing available Pcu components.",
+        "responses": {
+          "200": {
+            "description": "Pcu list returned successfully."
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Pcu"
+        ],
+        "summary": "Create new component.",
+        "description": "Accessible to admin only",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostPcuDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostPcuDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostPcuDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component created sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          }
+        }
+      }
+    },
+    "/api/Pcu/{id}": {
+      "get": {
+        "tags": [
+          "Pcu"
+        ],
+        "summary": "Retrieves component by id.",
+        "description": "Read endpoint for showing component description",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "component specs returned successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetPcuDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetPcuDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetPcuDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "404": {
+            "description": "Not found. omponent was not found."
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Pcu"
+        ],
+        "summary": "Update component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component Updated sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pcu"
+        ],
+        "summary": "Delete component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component deleted sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      }
+    },
+    "/api/Ram": {
+      "get": {
+        "tags": [
+          "Ram"
+        ],
+        "summary": "Retrieves all CPUs.",
+        "description": "Read endpoint for browsing available CPU components.",
+        "responses": {
+          "200": {
+            "description": "CPU list returned successfully."
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Ram"
+        ],
+        "summary": "Create new component.",
+        "description": "Accessible to admin only",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostRamDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostRamDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostRamDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component created sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          }
+        }
+      }
+    },
+    "/api/Ram/{id}": {
+      "get": {
+        "tags": [
+          "Ram"
+        ],
+        "summary": "Retrieves component by id.",
+        "description": "Read endpoint for showing component description",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "component specs returned successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetRamDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetRamDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetRamDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "404": {
+            "description": "Not found. omponent was not found."
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Ram"
+        ],
+        "summary": "Update component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component Updated sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Ram"
+        ],
+        "summary": "Delete component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component deleted sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      }
+    },
+    "/api/SSD": {
+      "get": {
+        "tags": [
+          "SSD"
+        ],
+        "summary": "Retrieves all SSD.",
+        "description": "Read endpoint for browsing available SSD components.",
+        "responses": {
+          "200": {
+            "description": "SSD list returned successfully."
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "SSD"
+        ],
+        "summary": "Create new component.",
+        "description": "Accessible to admin only",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSSDDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSSDDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSSDDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component created sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          }
+        }
+      }
+    },
+    "/api/SSD/{id}": {
+      "get": {
+        "tags": [
+          "SSD"
+        ],
+        "summary": "Retrieves component by id.",
+        "description": "Read endpoint for showing component description",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "component specs returned successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetSSDDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetSSDDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetSSDDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "404": {
+            "description": "Not found. omponent was not found."
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "SSD"
+        ],
+        "summary": "Update component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseDtoCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Component Updated sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "SSD"
+        ],
+        "summary": "Delete component.",
+        "description": "Accessible to admin only",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Component deleted sucessfully"
+          },
+          "401": {
+            "description": "Unauthorized. Authentication required."
+          },
+          "403": {
+            "description": "Forbidden. Admin required"
+          },
+          "404": {
+            "description": "Not found. Component was not found."
+          }
+        }
+      }
+    },
+    "/api/user/login": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "A registered user logs in.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/user/register": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "A new user registers",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BaseDtoCreate": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetCPUDto": {
+        "required": [
+          "model"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "nullable": true,
+            "example": "Ryzen 7 7800X3D"
+          },
+          "cores": {
+            "type": "integer",
+            "format": "int32",
+            "example": 8
+          },
+          "amd": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetGPUDto": {
+        "required": [
+          "brand",
+          "model"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          },
+          "brand": {
+            "type": "string",
+            "nullable": true,
+            "example": "Powercolor Hellhound"
+          },
+          "model": {
+            "type": "string",
+            "nullable": true,
+            "example": "9070xt"
+          },
+          "volts": {
+            "type": "integer",
+            "format": "int32",
+            "example": 850
+          },
+          "rgb": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetMoboDto": {
+        "required": [
+          "chip",
+          "model"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "nullable": true,
+            "example": "Msi"
+          },
+          "chip": {
+            "type": "string",
+            "nullable": true,
+            "example": "870"
+          },
+          "rating": {
+            "type": "string",
+            "example": "S"
+          },
+          "ddrSupport": {
+            "type": "integer",
+            "format": "int32",
+            "example": 4
+          },
+          "rgbSupport": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetPcuDto": {
+        "required": [
+          "model"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          },
+          "volts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "modular": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetRamDto": {
+        "required": [
+          "model"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "nullable": true,
+            "example": "Patriot Viper"
+          },
+          "gigabytes": {
+            "type": "integer",
+            "format": "int32",
+            "example": 32
+          },
+          "speed": {
+            "type": "integer",
+            "format": "int32",
+            "example": 6400
+          },
+          "rgb": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetSSDDto": {
+        "required": [
+          "brand",
+          "model"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          },
+          "brand": {
+            "type": "string",
+            "nullable": true,
+            "example": "Samsung"
+          },
+          "model": {
+            "type": "string",
+            "nullable": true,
+            "example": "99Evo"
+          },
+          "spd": {
+            "type": "integer",
+            "format": "int32",
+            "example": 6000
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32",
+            "example": 500
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostCPUDto": {
+        "required": [
+          "model"
+        ],
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          },
+          "power": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cores": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "amd": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostConfigDto": {
+        "required": [
+          "configName",
+          "purpose"
+        ],
+        "type": "object",
+        "properties": {
+          "configName": {
+            "type": "string",
+            "nullable": true
+          },
+          "purpose": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostGPUDto": {
+        "required": [
+          "brand",
+          "model"
+        ],
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          },
+          "brand": {
+            "type": "string",
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          },
+          "power": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "volts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rgb": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostMoboDto": {
+        "required": [
+          "chip",
+          "model"
+        ],
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          },
+          "chip": {
+            "type": "string",
+            "nullable": true
+          },
+          "rating": {
+            "type": "string"
+          },
+          "ddrSupport": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rgbSupport": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostPcuDto": {
+        "required": [
+          "model"
+        ],
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          },
+          "volts": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rating": {
+            "type": "string"
+          },
+          "modular": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostRamDto": {
+        "required": [
+          "model"
+        ],
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          },
+          "gigabytes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "speed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rgb": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostSSDDto": {
+        "required": [
+          "brand",
+          "model"
+        ],
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "photo": {
+            "type": "string",
+            "nullable": true
+          },
+          "brand": {
+            "type": "string",
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          },
+          "spd": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RegisterDto": {
+        "required": [
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "password": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Please enter a valid token",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}
